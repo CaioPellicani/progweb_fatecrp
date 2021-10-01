@@ -11,6 +11,7 @@ services:
             - ./www/src:/var/www/html/
         ports:
             - 8000:80
+
     db:
         container_name: db
         image: mysql
@@ -20,8 +21,11 @@ services:
             MYSQL_DATABASE: spetaculo
             MYSQL_USER: admin
             MYSQL_PASSWORD: admin
+        volumes:
+            - ./sql_dump/:/docker-entrypoint-initdb.d/
         ports:
-            - "9906:3306"
+            - "9906:3306"        
+
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         ports:
