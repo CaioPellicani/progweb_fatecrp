@@ -7,9 +7,11 @@ if (isset($_GET['id_venda'])) {
     $id_venda = mysqli_real_escape_string($conn, $_GET['id_venda']);
 
     //Monta a query
-    $sql = "SELECT * 
-    FROM tb_venda
-    WHERE id_venda = $id_venda;";
+    $sql = "
+        SELECT v.qtde_inteira, v.qtde_meia, e.preco
+        FROM tb_venda v
+        LEFT JOIN tb_evento e ON (v.id_evento = e.id_evento )
+        WHERE id_venda = $id_venda;";
 
     //Executa a query e guarda em $result
     $result = mysqli_query($conn, $sql);
@@ -19,7 +21,7 @@ if (isset($_GET['id_venda'])) {
 
     $qtde_inteira = $vendas['qtde_inteira'];
     $qtde_meia = $vendas['qtde_meia'];
-    $valor_total = $vendas['valor_total'];
+    $valor_total = ( $qtde_inteira * $vendas['preco'] ) + ( ( $qtde_meia * $vendas['preco'] ) / 2 );
 
     mysqli_free_result($result);
 

@@ -2,7 +2,7 @@
 
 include('config/bd_conexao.php');
 
-$erros = array('qtde_inteira' => '', 'qtde_meia' => '');
+$erros = array('qtde_inteira' => '', 'qtde_meia' => '', 'capacidade' => '');
 $qtde_inteira = $qtde_meia = '';
 
 //Verifica se o parâmetro id_evento foi enviado pelo get_browser
@@ -11,10 +11,12 @@ if (isset($_GET['id_evento'])) {
     $id_evento = mysqli_real_escape_string($conn, $_GET['id_evento']);
 
     //Monta a query
-    $sql = "SELECT *
+    $sql =  "SELECT s.nomeShow, s.localidade, s.descricao, s.capacidade, COUNT( v.id_venda) as vendas,
+                    e.dt_evento, e.horario, e.preco
             FROM tb_evento e
             INNER JOIN tb_show s ON (e.id_show = s.id_show)
-            WHERE id_evento = $id_evento;";
+            LEFT JOIN tb_venda v ON (e.id_evento = v.id_evento)
+            WHERE e.id_evento = $id_evento;";
 
     //Executa a query e guarda em $result
     $result = mysqli_query($conn, $sql);
@@ -25,7 +27,7 @@ if (isset($_GET['id_evento'])) {
     $nomeShow = $eventos['nomeShow'];
     $localidade = $eventos['localidade'];
     $descricao = $eventos['descricao'];
-    $capacidade = $eventos['capacidade'];
+    $capacidade = $eventos['capacidade'] - $eventos['vendas'];
     $dt_evento = $eventos['dt_evento'];
     $horario = $eventos['horario'];
     $preco = $eventos['preco'];
@@ -49,6 +51,9 @@ if (isset($_POST['comprar'])) {
         $erros['qtde_meia'] = 'Informar somente números.';
         $qtde_meia = '';
     }
+    if ( $capacidade <= 0 ){
+        $erros['capacidade' ] = 'Ingressos Esgotados';
+    }
 
     if (array_filter($erros)) {
         //echo 'Erro no formulário';
@@ -61,13 +66,14 @@ if (isset($_POST['comprar'])) {
         $valor_total = ($qtde_inteira * $preco) + ($qtde_meia * $preco / 2);
 
         //Criando a query
-        $sql = "INSERT INTO tb_venda (id_evento, qtde_inteira, qtde_meia, valor_total)
-                VALUE ('$id_evento', '$qtde_inteira', '$qtde_meia', '$valor_total');";
+        $sql = "INSERT INTO tb_venda (id_evento, qtde_inteira, qtde_meia)
+                VALUE ('$id_evento', '$qtde_inteira', '$qtde_meia');";
 
         //Salva no banco de dados
-        if (mysqli_query($conn, $sql)) {
-            //Sucesso
-            header('Location: #');
+        if ($sqlresult = mysqli_query($conn, $sql)) {
+            $result = $conn->query( "SELECT MAX(id_venda) AS id_venda FROM tb_venda;");
+            $id_venda = $result->fetch_assoc();
+            header('Location: confirmacao.php?id_venda=' . $id_venda['id_venda']);
         } else {
             echo 'Query error: ' . mysqli_error($conn);
         }
