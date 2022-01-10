@@ -29,4 +29,3 @@ CONSTRAINT fk_tb_venda_id_show FOREIGN KEY (id_evento)
 );
 
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae, tenetur.
