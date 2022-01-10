@@ -19,7 +19,6 @@
 	$dt_evento = $horario = $preco = '';
 
 	if (isset($_POST['incluir'])) {
-
 		//Verificar show
 		if (empty($_POST['id_show'])) {
 			$erros['id_show'] = 'Por gentileza selecionar uma opção.';

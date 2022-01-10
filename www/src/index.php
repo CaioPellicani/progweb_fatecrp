@@ -37,7 +37,7 @@ mysqli_close($conn);
                     <div class="card-content center">
                         <span class="card-title"><b><?php echo htmlspecialchars($evento['nomeShow']); ?></b></span>
                         <p><?php echo htmlspecialchars($evento['localidade']); ?></p>
-                        <p><?php echo htmlspecialchars($evento['dt_evento']); ?></p>
+                        <p><?php echo htmlspecialchars(date("d/m/Y", strtotime($evento['dt_evento']))); ?></p>
                     </div>
                     <div class="card-action center">
                     <a class="black-text" href="alterarShow.php?id_show=<?php echo $evento['id_show'] ?>">Editar Show</a>

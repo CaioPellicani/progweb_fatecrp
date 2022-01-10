@@ -51,9 +51,6 @@ if (isset($_POST['comprar'])) {
         $erros['qtde_meia'] = 'Informar somente números.';
         $qtde_meia = '';
     }
-    if ( $capacidade <= 0 ){
-        $erros['capacidade' ] = 'Ingressos Esgotados';
-    }
 
     if (array_filter($erros)) {
         //echo 'Erro no formulário';
@@ -71,7 +68,7 @@ if (isset($_POST['comprar'])) {
 
         //Salva no banco de dados
         if ($sqlresult = mysqli_query($conn, $sql)) {
-            $result = $conn->query( "SELECT MAX(id_venda) AS id_venda FROM tb_venda;");
+            $result = $conn->query("SELECT MAX(id_venda) AS id_venda FROM tb_venda;");
             $id_venda = $result->fetch_assoc();
             header('Location: confirmacao.php?id_venda=' . $id_venda['id_venda']);
         } else {
@@ -131,8 +128,8 @@ if (isset($_POST['voltar'])) {
                 </div>
                 <div class="col s6 center">
                     <label class="black-text">MEIA ENTRADA</label>
-                    <input type="number" min="0" name="qtde_meia" value="0" class="right-align">
-                    <span class="helper-text" data-error="wrong" data-success="right">Estou ciente das regras de compra da meia entrada.</span>
+                    <input id="meia_entrada" type="number" min="0" name="qtde_meia" value="0" class="right-align" onchange="validarMeia(this.value)">
+                    <div id="aviso" style="display: none; height: 100px;">0</div>
                 </div>
             </div>
         </div>
@@ -145,4 +142,15 @@ if (isset($_POST['voltar'])) {
 
 <?php include('templates/footer.php'); ?>
 
+<script type="text/javascript">
+    function validarMeia(val) {
+        if ( val > 0 && document.getElementById("aviso").innerText == '0'){
+            if( window.confirm( "Estou ciente das regras de compra da meia entrada." ) ){
+                document.getElementById("aviso").innerText = '1';
+            }else{
+                document.getElementById("meia_entrada").value = 0;
+            }
+        }
+    }
+</script>
 </html>
